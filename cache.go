@@ -294,9 +294,9 @@ func (c *Cache[K, V]) Delete(key K) {
 	c.evict(EvictionReasonDeleted, elem)
 }
 
-// GetOrStore returns the existing value for the key if present.
-// Otherwise, it stores and returns the given value. The retrieved
-// result is true if the value was retrieved, false if stored.
+// GetOrSet returns the existing value for the key if present.
+// Otherwise, it sets and returns the given value. The retrieved
+// result is true if the value was retrieved, false if set.
 func (c *Cache[K, V]) GetOrSet(key K, value V, ttl time.Duration) (*Item[K, V], bool) {
 	c.items.mu.Lock()
 	defer c.items.mu.Unlock()
