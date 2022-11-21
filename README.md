@@ -1,8 +1,6 @@
 # TTLCache - an in-memory cache with item expiration
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/savid/ttlcache/v3.svg)](https://pkg.go.dev/github.com/savid/ttlcache/v3)
-[![Build Status](https://github.com/savid/ttlcache/actions/workflows/go.yml/badge.svg)](https://github.com/savid/ttlcache/actions/workflows/go.yml)
-[![Coverage Status](https://coveralls.io/repos/github/savid/ttlcache/badge.svg?branch=master)](https://coveralls.io/github/savid/ttlcache?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/savid/ttlcache/v3)](https://goreportcard.com/report/github.com/savid/ttlcache/v3)
 
 ## Features
@@ -88,6 +86,12 @@ func main() {
 	cache.Delete("second")
 	cache.DeleteExpired()
 	cache.DeleteAll()
+
+	// retrieve data if in cache otherwise insert data
+	item, retrieved := cache.GetOrSet("fourth", "value4", ttlcache.DefaultTTL)
+
+	// retrieve and delete data
+	item, present := cache.GetAndDelete("fourth")
 }
 ```
 
