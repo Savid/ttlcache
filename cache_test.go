@@ -599,6 +599,36 @@ func Test_Cache_Delete(t *testing.T) {
 	assert.NotContains(t, cache.items.values, "1")
 }
 
+func Test_Cache_GetOrSet(t *testing.T) {
+	cache := prepCache(time.Hour, "test1", "test2", "test3")
+	item, retrieved := cache.GetOrSet("hello", "value123", time.Minute)
+	require.NotNil(t, item)
+	assert.Same(t, item, cache.items.values["hello"].Value)
+	assert.False(t, retrieved)
+
+	item, retrieved = cache.GetOrSet("hello", "value123", time.Minute)
+	require.NotNil(t, item)
+	assert.Same(t, item, cache.items.values["hello"].Value)
+	assert.True(t, retrieved)
+}
+
+func Test_Cache_GetAndDelete(t *testing.T) {
+	cache := prepCache(time.Hour, "test1", "test2", "test3")
+	item := cache.Set("test1", "value123", time.Minute)
+	require.NotNil(t, item)
+	assert.Same(t, item, cache.items.values["test1"].Value)
+
+	item, present := cache.GetAndDelete("test1")
+	require.NotNil(t, item)
+	assert.Nil(t, cache.items.values["test1"])
+	assert.True(t, present)
+
+	item, present = cache.GetAndDelete("test1")
+	require.Nil(t, item)
+	assert.Nil(t, cache.items.values["test1"])
+	assert.False(t, present)
+}
+
 func Test_Cache_DeleteAll(t *testing.T) {
 	var (
 		key1FnsCalls int

@@ -294,6 +294,37 @@ func (c *Cache[K, V]) Delete(key K) {
 	c.evict(EvictionReasonDeleted, elem)
 }
 
+// GetOrStore returns the existing value for the key if present.
+// Otherwise, it stores and returns the given value. The retrieved
+// result is true if the value was retrieved, false if stored.
+func (c *Cache[K, V]) GetOrSet(key K, value V, ttl time.Duration) (*Item[K, V], bool) {
+	c.items.mu.Lock()
+	defer c.items.mu.Unlock()
+
+	elem := c.get(key, false)
+	if elem != nil {
+		return elem.Value.(*Item[K, V]), true
+	}
+
+	return c.set(key, value, ttl), false
+}
+
+// GetAndDelete deletes the value for a key, returning the previous
+// value if any. The retrieved result reports whether the key was present.
+func (c *Cache[K, V]) GetAndDelete(key K) (*Item[K, V], bool) {
+	c.items.mu.Lock()
+	defer c.items.mu.Unlock()
+
+	elem := c.get(key, false)
+	if elem == nil {
+		return nil, false
+	}
+
+	c.evict(EvictionReasonDeleted, elem)
+
+	return elem.Value.(*Item[K, V]), true
+}
+
 // DeleteAll deletes all items from the cache.
 func (c *Cache[K, V]) DeleteAll() {
 	c.items.mu.Lock()
